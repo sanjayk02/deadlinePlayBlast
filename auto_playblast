@@ -1,0 +1,51 @@
+import maya.standalone 
+maya.standalone.initialize(name='python')
+
+import maya.cmds as cmds
+import maya.mel as mel
+import os
+
+# === CONFIGURATION ===
+
+maya_scene_path = r"C:\Projects\MyScene.mb"
+output_video_path = r"C:\Projects\MyScene.mov"
+start_frame = 1
+end_frame = 120
+resolution = [1280, 720]
+playblast_format = "qt"
+compression = "H.264"
+show_ornaments = False
+
+# === OPEN SCENE ===
+if os.path.exists(maya_scene_path):
+    cmds.file(maya_scene_path, open=True, force=True)
+    print("Opened scene: {}".format(maya_scene_path))
+else:
+    raise FileNotFoundError("Scene file not found: {}".format(maya_scene_path))
+
+# === SETUP TIMELINE ===
+# cmds.playbackOptions(min=start_frame, max=end_frame)
+
+# === CLEANUP EXISTING FILE ===
+if os.path.exists(output_video_path):
+    try:
+        os.remove(output_video_path)
+    except Exception as e:
+        raise RuntimeError("Can't delete existing file: {}".format(output_video_path))
+
+# === MAKE PLAYBLAST ===
+cmds.playbackOptions(min=3, max=8)
+cmds.playblast(
+    format="image",
+    filename="C:/Projects/frames/frame",
+    startTime=1,
+    endTime=120,
+    viewer=False,
+    showOrnaments=False,
+    offScreen=True,
+    widthHeight=[1280, 720],
+    percent=100
+)
+
+# === EXIT MAYA ===
+mel.eval('quit -f')
